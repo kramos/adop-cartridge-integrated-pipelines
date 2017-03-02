@@ -63,16 +63,12 @@ def stDeployJob = CartridgeHelper.getShellJob(this, projectFolderName + '/' + ap
 )
 
 
-def stTestJob = CartridgeHelper.getShellAuthJob(this, projectFolderName + '/' + appName + '_ST_Test', variables + [
+def stTestJob = CartridgeHelper.basePipelineJob(this, projectFolderName + '/' + appName + '_ST_Test', variables + [
         'copyArtifactsFromJob': projectFolderName + '/' + appName + '_Build',
         'nextCopyArtifactsFromBuild': '${B}',
         'triggerDownstreamJob': projectFolderName + '/TODO',
         'jobDescription': 'This job runs the functional testing in the ST environment and logs a new integration build candidate',
-        'jobCommand': 'FOLDER=`echo ' + projectFolderName + ''' | sed "s/\\//\\/job\\//g"`; 
-                      |set +x
-                      |echo TRIGGERING INTEGRATION BUILD 
-                      |echo
-                      |docker exec jenkins curl -s -X POST ${USERNAME_JENKINS}:${PASSWORD_JENKINS}@localhost:8080/jenkins/job/${FOLDER}/job/Integrated_Build/buildWithParameters?COMPONENT_NAME=''' + appName + '\\&COMPONENT_BUILD_NUMBER=${B}',
+        'appName': appName,
     ]
 )
 

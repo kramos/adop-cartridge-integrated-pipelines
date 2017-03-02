@@ -226,6 +226,61 @@ class CartridgeHelper {
         return jobShellJob
     }
 
+
+    /**
+     * Creates a pipeline step job
+     * @dslFactory base DSL file
+     * @jobName Jenkins job name
+     * @variables reuired variables
+     */
+    static basePipelineJob(dslFactory, jobName, variables) {
+        dslFactory.workflowJob(jobName) {
+            description(variables.jobDescription)
+            label(variables.buildSlave)
+            environmentVariables {
+                env('WORKSPACE_NAME', variables.workspaceFolderName)
+                env('PROJECT_NAME', variables.projectFolderName)
+                env('ABSOLUTE_JENKINS_HOME', variables.absoluteJenkinsHome)
+                env('ABSOLUTE_JENKINS_SLAVE_HOME', variables.absoluteJenkinsSlaveHome)
+                env('ABSOLUTE_WORKSPACE', variables.absoluteWorkspace)
+            }
+            wrappers {
+                sshAgent(variables.sshAgentName)
+                timestamps()
+                maskPasswords()
+                colorizeOutput()
+                preBuildCleanup()
+                injectPasswords {
+                    injectGlobalPasswords(false)
+                    maskPasswordParameters(true)
+                }
+            }
+            logRotator {
+                numToKeep(variables.logRotatorNum)
+                artifactNumToKeep(variables.logRotatorArtifactNum)
+                daysToKeep(variables.logRotatorDays)
+                artifactDaysToKeep(variables.logRotatorArtifactDays)
+            }
+
+            parameters {
+                stringParam('B', '', 'Parent build job number')
+            }
+            properties {
+                rebuild {
+                    autoRebuild(false)
+                    rebuildDisabled(false)
+                }
+            }
+            definition {
+                cps {
+                    script('''
+                        build job: ''' + variables.projectFolderName + '/Integrated_Build', parameters: [[$class: 'StringParameterValue', name: 'COMPONENT_NAME', value: ' + variables.appName + '], [$class: 'StringParameterValue', name: 'COMPONENT_BUILD_NUMBER', value: '${B}']]
+                    ''')
+                    }
+            }
+
+    }
+
     /**
      * Creates an integration job
      *
