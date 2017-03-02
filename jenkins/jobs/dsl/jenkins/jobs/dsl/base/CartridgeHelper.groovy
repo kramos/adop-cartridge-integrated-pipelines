@@ -273,7 +273,7 @@ class CartridgeHelper {
             }
             definition {
                 cps {
-                    script('build job: ' + variables.projectFolderName + '''/Integrated_Build, parameters: [[$class: 'StringParameterValue', name: 'COMPONENT_NAME', value: ' + variables.appName + '], [$class: 'StringParameterValue', name: 'COMPONENT_BUILD_NUMBER', value: '${B}']]''')
+                    script("build job: '" + variables.projectFolderName + '''/Integrated_Build', parameters: [[$class: 'StringParameterValue', name: 'COMPONENT_NAME', value: ''' + variables.appName + '''], [$class: 'StringParameterValue', name: 'COMPONENT_BUILD_NUMBER', value: '${B}']]''')
                     }
             }
         }
